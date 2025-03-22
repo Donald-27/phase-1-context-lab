@@ -1,49 +1,43 @@
 /* Your Code Here */
-function createEmployeeRecord(arr) {
+function createEmployeeRecord(employeeArray) {
     return {
-        firstName: arr[0],
-        familyName: arr[1],
-        title: arr[2],
-        payPerHour: arr[3],
+        firstName: employeeArray[0],
+        familyName: employeeArray[1],
+        title: employeeArray[2],
+        payPerHour: employeeArray[3],
         timeInEvents: [],
         timeOutEvents: []
     };
 }
 
-function createEmployeeRecords(arr) {
-    let records = [];
-    for (let i = 0; i < arr.length; i++) {
-        records.push(createEmployeeRecord(arr[i]));
-    }
-    return records;
+function createEmployeeRecords(employeesArray) {
+    return employeesArray.map(createEmployeeRecord);
 }
 
 function createTimeInEvent(dateStamp) {
-    let parts = dateStamp.split(" ");
-    let event = {
+    let [date, hour] = dateStamp.split(" ");
+    this.timeInEvents.push({
         type: "TimeIn",
-        date: parts[0],
-        hour: parseInt(parts[1])
-    };
-    this.timeInEvents.push(event);
+        date: date,
+        hour: parseInt(hour, 10)
+    });
     return this;
 }
 
 function createTimeOutEvent(dateStamp) {
-    let parts = dateStamp.split(" ");
-    let event = {
+    let [date, hour] = dateStamp.split(" ");
+    this.timeOutEvents.push({
         type: "TimeOut",
-        date: parts[0],
-        hour: parseInt(parts[1])
-    };
-    this.timeOutEvents.push(event);
+        date: date,
+        hour: parseInt(hour, 10)
+    });
     return this;
 }
 
 function hoursWorkedOnDate(date) {
-    let timeIn = this.timeInEvents.find(e => e.date === date);
-    let timeOut = this.timeOutEvents.find(e => e.date === date);
-    return (timeOut.hour - timeIn.hour) / 100;
+    let inEvent = this.timeInEvents.find(e => e.date === date);
+    let outEvent = this.timeOutEvents.find(e => e.date === date);
+    return (outEvent.hour - inEvent.hour) / 100;
 }
 
 function wagesEarnedOnDate(date) {
@@ -51,28 +45,16 @@ function wagesEarnedOnDate(date) {
 }
 
 function allWagesFor() {
-    let total = 0;
-    for (let i = 0; i < this.timeInEvents.length; i++) {
-        total += wagesEarnedOnDate.call(this, this.timeInEvents[i].date);
-    }
-    return total;
+    const eligibleDates = this.timeInEvents.map(e => e.date);
+    return eligibleDates.reduce((memo, d) => memo + wagesEarnedOnDate.call(this, d), 0);
 }
 
-function findEmployeeByFirstName(arr, firstName) {
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i].firstName === firstName) {
-            return arr[i];
-        }
-    }
-    return undefined;
+function findEmployeeByFirstName(srcArray, firstName) {
+    return srcArray.find(emp => emp.firstName === firstName);
 }
 
-function calculatePayroll(arr) {
-    let total = 0;
-    for (let i = 0; i < arr.length; i++) {
-        total += allWagesFor.call(arr[i]);
-    }
-    return total;
+function calculatePayroll(employeeRecords) {
+    return employeeRecords.reduce((total, emp) => total + allWagesFor.call(emp), 0);
 }
                       
 /*
